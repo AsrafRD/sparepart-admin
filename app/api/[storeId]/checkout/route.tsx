@@ -56,21 +56,21 @@ export async function POST(
     name: product.name,
   }));
 
-  const order = await prismadb.order.create({
-    data: {
-      storeId: params.storeId,
-      isPaid: false,
-      orderItems: {
-        create: productIds.map((productId: string) => ({
-          product: {
-            connect: {
-              id: productId,
-            },
-          },
-        })),
-      },
-    },
-  });
+  // const order = await prismadb.order.create({
+  //   data: {
+  //     storeId: params.storeId,
+  //     isPaid: false,
+  //     orderItems: {
+  //       create: productIds.map((productId: string) => ({
+  //         product: {
+  //           connect: {
+  //             id: productId,
+  //           },
+  //         },
+  //       })),
+  //     },
+  //   },
+  // });
 
   const successUrl = `${process.env.FRONTEND_STORE_URL}/cart?/success=1`; // Ganti sesuai kebijakan URL Anda
   const cancelUrl = `${process.env.FRONTEND_STORE_URL}/cart?/cancel=1`; // Ganti sesuai kebijakan URL Anda
@@ -84,7 +84,8 @@ export async function POST(
     success_redirect_url: successUrl, // URL setelah pembayaran berhasil
     failure_redirect_url: cancelUrl, // URL jika pembayaran dibatalkan
     metadata: {
-      orderId: order.id,
+      orderId: generateOrderId(),
+      // orderId: order.id,
     },
   });
 
