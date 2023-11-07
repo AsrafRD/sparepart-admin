@@ -7,7 +7,6 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
-
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
@@ -23,7 +22,7 @@ function generateOrderId() {
 function calculateTotalAmount(items: any[]) {
   let totalAmount = 0;
 
-  items.forEach((item: any) => { // Perbaikan: Tambahkan tipe "any" pada parameter
+  items.forEach((item: { price: number; quantity: number }) => {
     const itemPrice = item.price * item.quantity;
     totalAmount += itemPrice;
   });
@@ -72,18 +71,18 @@ export async function POST(
         })),
       },
       buyerName: formData.name, // Menyimpan nama pembeli
-      phone: formData.phone,     // Menyimpan nomor telepon pembeli
+      phone: formData.phone, // Menyimpan nomor telepon pembeli
       address: formData.address, // Menyimpan alamat pembeli
-      Email: formData.email, // Menyimpan alamat pembeli
+      Email: formData.Email, // Menyimpan alamat pembeli
     },
   });
 
   const successUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/success=1`; // Ganti sesuai kebijakan URL Anda
-  const cancelUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/canceled=1`; // Ganti sesuai kebijakan URL Anda
+  const cancelUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/cancel=1`; // Ganti sesuai kebijakan URL Anda
 
   const session = await snap.createTransaction({
     transaction_details: {
-      // order_id: order.id, // Menggunakan ID pesanan dari basis data Anda
+      // order_id: generateOrderId(), // Menggunakan ID pesanan dari basis data Anda
       order_id: order.id, // Menggunakan ID pesanan dari basis data Anda
       gross_amount: calculateTotalAmount(items), // Total jumlah pembayaran
     },
@@ -97,41 +96,18 @@ export async function POST(
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
-      }
+      },
     },
     success_redirect_url: successUrl, // URL setelah pembayaran berhasil
     failure_redirect_url: cancelUrl, // URL jika pembayaran dibatalkan
     metadata: {
+      // orderId: generateOrderId(),
       orderId: order.id,
     },
   });
 
-  const orderId = order.id;
-
-  await prismadb.order.update({
-    where: { id: orderId },
-    data: { isPaid: false }, // Ubah status pembayaran menjadi "true"
-  });
-
-  const orderItem = await prismadb.orderItem.findUnique({
-    where: {
-      id: order.id, // Ganti dengan ID keranjang sesuai dengan implementasi Anda
-    },
-  });
-  if (orderItem) {
-    await prismadb.orderItem.delete({
-      where: {
-        id: orderItem.id,
-      },
-    });
-  }
-
-  // const updatedCart = productIds.filter((item: any) => !productIds.includes(item.id));
-
   return NextResponse.json(
-    { url: session.redirect_url, 
-      // productIds: updatedCart 
-    },
+    { url: session.redirect_url },
     {
       headers: corsHeaders,
     }

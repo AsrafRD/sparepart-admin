@@ -6,24 +6,26 @@ generator client {
 }
 
 datasource db {
-  provider     = "cockroachdb"
+  // provider     = "cockroachdb"
+  provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
 model Store {
-  id           String        @id @default(uuid())
-  name         String
-  userId       String
-  billboard    Billboard[]   @relation("StoreToBillboard")
-  categories   Category[]    @relation("StoreToCategory")
-  products     Product[]     @relation("StoreToProduct")
+  id            String         @id @default(uuid())
+  name          String
+  userId        String
+  billboard     Billboard[]    @relation("StoreToBillboard")
+  categories    Category[]     @relation("StoreToCategory")
+  products      Product[]      @relation("StoreToProduct")
   vehicleBrands VehicleBrand[] @relation("StoreToVehicleBrand")
-  vehicleTypes VehicleType[] @relation("StoreToVehicleType")
+  vehicleTypes  VehicleType[]  @relation("StoreToVehicleType")
   productBrands ProductBrand[] @relation("StoreToProductBrand")
-  orders       Order[]       @relation("StoreToOrder")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  orders        Order[]        @relation("StoreToOrder")
+  suppliers     Supplier[]     @relation("StoreToSupplier")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Billboard {
@@ -65,6 +67,7 @@ model VehicleType {
 
   @@index([storeId])
 }
+
 model VehicleBrand {
   id        String    @id @default(uuid())
   storeId   String // Foreign Key to Store
@@ -90,25 +93,25 @@ model ProductBrand {
 }
 
 model Product {
-  id            String      @id @default(uuid())
-  storeId       String
-  store         Store       @relation("StoreToProduct", fields: [storeId], references: [id])
-  categoryId    String
-  category      Category    @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  id             String       @id @default(uuid())
+  storeId        String
+  store          Store        @relation("StoreToProduct", fields: [storeId], references: [id])
+  categoryId     String
+  category       Category     @relation("CategoryToProduct", fields: [categoryId], references: [id])
   vehicleBrandId String // Foreign Key to VehicleBrand
   vehicleBrand   VehicleBrand @relation(fields: [vehicleBrandId], references: [id])
-  vehicleTypeId String // Foreign Key to VehicleType
-  vehicleType   VehicleType @relation(fields: [vehicleTypeId], references: [id])
+  vehicleTypeId  String // Foreign Key to VehicleType
+  vehicleType    VehicleType  @relation(fields: [vehicleTypeId], references: [id])
   productBrandId String // Foreign Key to ProdyctBrand
-  productBrand  ProductBrand @relation(fields: [productBrandId], references: [id])
-  name          String
-  price         Decimal
-  isFeatured    Boolean     @default(false)
-  isArchived    Boolean     @default(false)
-  images        Image[]
-  orderItems    OrderItem[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  productBrand   ProductBrand @relation(fields: [productBrandId], references: [id])
+  name           String
+  price          Decimal
+  isFeatured     Boolean      @default(false)
+  isArchived     Boolean      @default(false)
+  images         Image[]
+  orderItems     OrderItem[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   @@index([storeId])
   @@index([categoryId])
@@ -134,8 +137,10 @@ model Order {
   store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
   orderItems OrderItem[]
   isPaid     Boolean     @default(false)
+  buyerName  String      @default("")
   phone      String      @default("")
   address    String      @default("")
+  Email      String      @default("")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
@@ -151,4 +156,17 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  storeId   String
+  address   String
+  phone     String
+  store     Store    @relation("StoreToSupplier", fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
 }
