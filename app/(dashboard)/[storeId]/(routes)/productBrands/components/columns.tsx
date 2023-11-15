@@ -13,11 +13,11 @@ export type productBrandColumn = {
 export const columns: ColumnDef<productBrandColumn>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Nama",
   },
   {
     accessorKey: "createdAt",
-    header: "Date",
+    header: "Dibuat",
   },
   {
     id: "actions",

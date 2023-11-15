@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 import snap from "@/lib/midtrans"; // Impor modul Midtrans
+import { auth } from "@clerk/nextjs";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,7 +24,8 @@ function generateOrderId() {
 function calculateTotalAmount(items: any[]) {
   let totalAmount = 0;
 
-  items.forEach((item: any) => { // Perbaikan: Tambahkan tipe "any" pada parameter
+  items.forEach((item: any) => {
+    // Perbaikan: Tambahkan tipe "any" pada parameter
     const itemPrice = item.price * item.quantity;
     totalAmount += itemPrice;
   });
@@ -35,105 +37,110 @@ export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
 ) {
-  const data = await req.json();
-  const { productIds, formData } = data;
+    const data = await req.json();
+    const { productIds, formData } = data;
 
-  if (!productIds || productIds.length === 0) {
-    return new NextResponse("Product id is required", { status: 400 });
-  }
+    if (!productIds || productIds.length === 0) {
+      return new NextResponse("Product id is required", { status: 400 });
+    }
 
-  const products = await prismadb.product.findMany({
-    where: {
-      id: {
-        in: productIds,
+    const products = await prismadb.product.findMany({
+      where: {
+        id: {
+          in: productIds,
+        },
       },
-    },
-  });
+    });
 
-  // Buat daftar item untuk Midtrans
-  const items = products.map((product) => ({
-    id: product.id,
-    price: product.price.toNumber(),
-    quantity: 1,
-    name: product.name,
-  }));
+    // Buat daftar item untuk Midtrans
+    const items = products.map((product) => ({
+      id: product.id,
+      price: product.price.toNumber(),
+      quantity: 1,
+      name: product.name,
+    }));
 
-  const order = await prismadb.order.create({
-    data: {
-      storeId: params.storeId,
-      isPaid: false,
-      orderItems: {
-        create: productIds.map((productId: string) => ({
-          product: {
-            connect: {
-              id: productId,
+    const order = await prismadb.order.create({
+      data: {
+        storeId: params.storeId,
+        isPaid: false,
+        orderItems: {
+          create: productIds.map((productId: string) => ({
+            product: {
+              connect: {
+                id: productId,
+              },
             },
-          },
-        })),
+          })),
+        },
+        buyerName: formData.name, // Menyimpan nama pembeli
+        phone: formData.phone, // Menyimpan nomor telepon pembeli
+        address: formData.address, // Menyimpan alamat pembeli
+        Email: formData.email, // Menyimpan alamat pembeli
       },
-      buyerName: formData.name, // Menyimpan nama pembeli
-      phone: formData.phone,     // Menyimpan nomor telepon pembeli
-      address: formData.address, // Menyimpan alamat pembeli
-      Email: formData.email, // Menyimpan alamat pembeli
-    },
-  });
+    });
 
-  const successUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/success=1`; // Ganti sesuai kebijakan URL Anda
-  const cancelUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/canceled=1`; // Ganti sesuai kebijakan URL Anda
+    const successUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/success=1`; // Ganti sesuai kebijakan URL Anda
+    const cancelUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/canceled=1`; // Ganti sesuai kebijakan URL Anda
 
-  const session = await snap.createTransaction({
-    transaction_details: {
-      // order_id: order.id, // Menggunakan ID pesanan dari basis data Anda
-      order_id: order.id, // Menggunakan ID pesanan dari basis data Anda
-      gross_amount: calculateTotalAmount(items), // Total jumlah pembayaran
-    },
-    item_details: items,
-    customer_details: {
-      first_name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      billing_address: {
+    const session = await snap.createTransaction({
+      transaction_details: {
+        // order_id: order.id, // Menggunakan ID pesanan dari basis data Anda
+        order_id: order.id, // Menggunakan ID pesanan dari basis data Anda
+        gross_amount: calculateTotalAmount(items), // Total jumlah pembayaran
+      },
+      item_details: items,
+      customer_details: {
         first_name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        address: formData.address,
-      }
-    },
-    success_redirect_url: successUrl, // URL setelah pembayaran berhasil
-    failure_redirect_url: cancelUrl, // URL jika pembayaran dibatalkan
-    metadata: {
-      orderId: order.id,
-    },
-  });
-
-  const orderId = order.id;
-
-  await prismadb.order.update({
-    where: { id: orderId },
-    data: { isPaid: false }, // Ubah status pembayaran menjadi "true"
-  });
-
-  const orderItem = await prismadb.orderItem.findUnique({
-    where: {
-      id: order.id, // Ganti dengan ID keranjang sesuai dengan implementasi Anda
-    },
-  });
-  if (orderItem) {
-    await prismadb.orderItem.delete({
-      where: {
-        id: orderItem.id,
+        billing_address: {
+          first_name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          address: formData.address,
+        },
+      },
+      success_redirect_url: successUrl, // URL setelah pembayaran berhasil
+      failure_redirect_url: cancelUrl, // URL jika pembayaran dibatalkan
+      metadata: {
+        orderId: order.id,
       },
     });
-  }
 
-  // const updatedCart = productIds.filter((item: any) => !productIds.includes(item.id));
+    const orderId = order.id;
 
-  return NextResponse.json(
-    { url: session.redirect_url, 
-      // productIds: updatedCart 
-    },
-    {
-      headers: corsHeaders,
+    await prismadb.order.update({
+      where: { id: orderId },
+      data: { isPaid: true }, // Ubah status pembayaran menjadi "true"
+    });
+
+    const orderItem = await prismadb.orderItem.findUnique({
+      where: {
+        id: order.id, // Ganti dengan ID keranjang sesuai dengan implementasi Anda
+      },
+    });
+    if (orderItem) {
+      await prismadb.orderItem.delete({
+        where: {
+          id: orderItem.id,
+        },
+      });
     }
-  );
+
+    // const updatedCart = productIds.filter((item: any) => !productIds.includes(item.id));
+
+    return NextResponse.json(
+      {
+        url: session.redirect_url,
+        // productIds: updatedCart
+      },
+      {
+        headers: corsHeaders,
+      }
+    );
+  // } catch (error) {
+  //   console.log("[CHECKOUT_POST]", error);
+  //   return new NextResponse("Internal error", { status: 500 });
+  // }
 }

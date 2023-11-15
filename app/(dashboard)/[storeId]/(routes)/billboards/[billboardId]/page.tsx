@@ -13,7 +13,7 @@ const BillboardPage = async ({
     });
     return (
         <div className="flex-col">
-            <div className="flex-1 space-x-4 p-8 pt-6">
+            <div className="flex-1 md:space-y-4 md:p-8 md:pt-6 space-y-2 px-4 pt-4">
                 <BillboardForm initialData={billboard}/>
             </div>
         </div>

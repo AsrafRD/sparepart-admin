@@ -43,10 +43,10 @@ export const VehicleBrandForm: React.FC<VehicleBrandFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit Vehicle Brand' : 'Create Vehicle Brand';
-  const description = initialData ? 'Edit a Vehicle Brand.' : 'Add a new Vehicle Brand';
-  const toastMessage = initialData ? 'Vehicle Brand updated.' : 'Vehicle Brand created.';
-  const action = initialData ? 'Save changes' : 'Create';
+  const title = initialData ? 'Edit Merek Kendaraan' : 'Tambah Merek Kendaraan';
+  const description = initialData ? 'Edit merek kendaraan ini.' : 'Tambah merek kendaraan baru';
+  const toastMessage = initialData ? 'Merek kendaraan berhasil diedit.' : 'Merek kendaraan baru berhasil ditambahkan.';
+  const action = initialData ? 'Simpan' : 'Tambahkan';
 
   const form = useForm<VehicleBrandFormValues>({
     resolver: zodResolver(formSchema),
@@ -67,7 +67,7 @@ export const VehicleBrandForm: React.FC<VehicleBrandFormProps> = ({
       router.push(`/${params.storeId}/vehicleBrands`);
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toast.error('Sepertinya ada kesalahan.');
     } finally {
       setLoading(false);
     }
@@ -79,9 +79,9 @@ export const VehicleBrandForm: React.FC<VehicleBrandFormProps> = ({
       await axios.delete(`/api/${params.storeId}/vehicleBrands/${params.vehicleBrandId}`);
       router.refresh();
       router.push(`/${params.storeId}/vehicleBrands`);
-      toast.success('vehicle Brand deleted.');
+      toast.success('Merek kendaraan berhasil dihapus.');
     } catch (error: any) {
-      toast.error('Make sure you removed all products using this vehicle Brand first.');
+      toast.error('Pastikan tidak ada elemen lain yang menggunakan elemen merek kendaraan ini.');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -118,9 +118,9 @@ export const VehicleBrandForm: React.FC<VehicleBrandFormProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="Vehicle brand Name" {...field} />
+                    <Input disabled={loading} placeholder="Nama merek kendaraan" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

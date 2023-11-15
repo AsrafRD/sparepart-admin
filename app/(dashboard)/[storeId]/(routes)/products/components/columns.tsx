@@ -20,39 +20,40 @@ export type ProductColumn = {
 export const columns: ColumnDef<ProductColumn>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Nama Produk",
   },
-  {
-    accessorKey: "isArchived",
-    header: "Archived",
-  },
-  {
-    accessorKey: "isFeatured",
-    header: "Featured",
-  },
+  
   {
     accessorKey: "price",
-    header: "Price",
+    header: "Harga",
   },
   {
     accessorKey: "category",
-    header: "Category",
+    header: "Kategori",
   },
   {
     accessorKey: "vehicleBrand",
-    header: "Vehicle Brand",
+    header: "Merek Kendaraan",
   },
   {
     accessorKey: "vehicleType",
-    header: "Vehicle Type",
+    header: "Tipe Kendaraan",
   },
   {
     accessorKey: "productBrand",
-    header: "Product Brand",
+    header: "Merek Produk",
   },
   {
     accessorKey: "createdAt",
-    header: "Date",
+    header: "Dibuat",
+  },
+  {
+    accessorKey: "isArchived",
+    header: "Tampilkan",
+  },
+  {
+    accessorKey: "isFeatured",
+    header: "Sediakan",
   },
   {
     id: "actions",

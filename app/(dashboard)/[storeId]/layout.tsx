@@ -3,35 +3,37 @@ import { redirect } from "next/navigation";
 
 import prismadb from "@/lib/prismadb";
 import Navbar from "@/components/navbar";
+import { ThemeProvider } from "@/providers/theme-provider";
 
 export default async function DashboardLayout({
-    children,
-    params
+  children,
+  params,
 }: {
-    children: React.ReactNode;
-    params: { storeId: string }
+  children: React.ReactNode;
+  params: { storeId: string };
 }) {
-    const { userId } = auth();
+  const { userId } = auth();
 
-    if (!userId) {
-        redirect('/sign-in');
-    }
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-    const store = await prismadb.store.findFirst({
-        where: {
-            id: params.storeId,
-            userId: userId
-        }
-    });
+  const store = await prismadb.store.findFirst({
+    where: {
+      id: params.storeId,
+      userId: userId,
+    },
+  });
 
-    if (!store) {
-        redirect('/');
-    }
+  if (!store) {
+    redirect("/");
+  }
 
-    return (
-        <>
-            <Navbar />
-            {children}
-        </>
-    );
-};
+  return (
+    <>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem />
+      <Navbar />
+      {children}
+    </>
+  );
+}

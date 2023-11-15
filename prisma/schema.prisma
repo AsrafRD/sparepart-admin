@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider     = "cockroachdb"
-  // provider     = "mysql"
+  // provider     = "cockroachdb"
+  provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
@@ -24,6 +24,7 @@ model Store {
   productBrands ProductBrand[] @relation("StoreToProductBrand")
   orders        Order[]        @relation("StoreToOrder")
   suppliers     Supplier[]     @relation("StoreToSupplier")
+  customers     Customer[]     @relation("StoreToCustomer")
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
@@ -132,17 +133,18 @@ model Image {
 }
 
 model Order {
-  id         String      @id @default(uuid())
-  storeId    String
-  store      Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems OrderItem[]
-  isPaid     Boolean     @default(false)
-  buyerName  String      @default("")
-  phone      String      @default("")
-  address    String      @default("")
-  Email      String      @default("")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  storeId     String
+  store       Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems  OrderItem[]
+  isPaid      Boolean     @default(false)
+  statusOrder String      @default("")
+  buyerName   String      @default("")
+  phone       String      @default("")
+  address     String      @default("")
+  Email       String      @default("")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   @@index([storeId])
 }
@@ -165,6 +167,21 @@ model Supplier {
   address   String
   phone     String
   store     Store    @relation("StoreToSupplier", fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  userId    String
+  storeId   String
+  address   String
+  phone     String
+  email     String
+  store     Store    @relation("StoreToCustomer", fields: [storeId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

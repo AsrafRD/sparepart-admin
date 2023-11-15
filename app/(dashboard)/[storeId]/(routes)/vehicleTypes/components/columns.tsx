@@ -13,11 +13,11 @@ export type VehicleTypeColumn = {
 export const columns: ColumnDef<VehicleTypeColumn>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Nama",
   },
   {
     accessorKey: "createdAt",
-    header: "Date",
+    header: "Dibuat",
   },
   {
     id: "actions",

@@ -47,10 +47,10 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit category' : 'Create category';
-  const description = initialData ? 'Edit a category.' : 'Add a new category';
-  const toastMessage = initialData ? 'Category updated.' : 'Category created.';
-  const action = initialData ? 'Save changes' : 'Create';
+  const title = initialData ? 'Edit Kategori' : 'Tambah Kategori';
+  const description = initialData ? 'Edit kategori ini.' : 'Tambah kategori baru';
+  const toastMessage = initialData ? 'Edit kategori berhasil.' : 'Kategori baru berhasil ditambahkan.';
+  const action = initialData ? 'Simpan' : 'Tambahkan';
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
@@ -72,7 +72,7 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       router.push(`/${params.storeId}/categories`);
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toast.error('Sepertinya ada yang salah.');
     } finally {
       setLoading(false);
     }
@@ -84,9 +84,9 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
       await axios.delete(`/api/${params.storeId}/categories/${params.categoryId}`);
       router.refresh();
       router.push(`/${params.storeId}/categories`);
-      toast.success('Category deleted.');
+      toast.success('Kategori berhasil dihapus.');
     } catch (error: any) {
-      toast.error('Make sure you removed all products using this category first.');
+      toast.error('Pastikan tidak ada elemen lain yang menggunakan elemen kategori ini.');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -123,9 +123,9 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="Category name" {...field} />
+                    <Input disabled={loading} placeholder="Nama kategori" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -136,16 +136,16 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({
               name="billboardId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Billboard</FormLabel>
+                  <FormLabel>Banner</FormLabel>
                   <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a billboard" />
+                        <SelectValue defaultValue={field.value} placeholder="Pilih banner" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {billboards.map((billboard) => (
-                        <SelectItem key={billboard.id} value={billboard.id}>{billboard.label}</SelectItem>
+                        <SelectItem className="-mx-6" key={billboard.id} value={billboard.id}>{billboard.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

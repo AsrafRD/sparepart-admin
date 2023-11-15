@@ -6,6 +6,8 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 import { ModalProvider } from "@/providers/modal-provider";
 import { ToasterProvider } from "@/providers/toast-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
+import Footer from "@/components/footer";
 
 const gabarito = Gabarito({ subsets: ["latin"] });
 
@@ -14,14 +16,23 @@ export const metadata: Metadata = {
   description: "Admin Dashboard",
 };
 
-export default function RootLayout({ children } : {children: React.ReactNode;}) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ClerkProvider>
       <html lang="en">
         <body className={gabarito.className}>
-          <ToasterProvider />
-          <ModalProvider />
-          {children}
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+            <ToasterProvider />
+            <ModalProvider />
+            {children}
+            <div className="mt-8">
+              <Footer />
+            </div>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

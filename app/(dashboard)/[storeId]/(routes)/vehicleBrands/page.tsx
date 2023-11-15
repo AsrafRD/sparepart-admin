@@ -22,7 +22,7 @@ const VehicleBrandsPage = async ({
   const formattedVehicleBrands: VehicleBrandColumn[] = vehicleBrands.map((item) => ({
     id: item.id,
     name: item.name,
-    createdAt: format(item.createdAt, 'MMMM do, yyyy'),
+    createdAt: format(item.createdAt, 'dd MMMM yyyy'),
   }));
 
   return (

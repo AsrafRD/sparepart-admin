@@ -13,11 +13,12 @@ interface OrderClientProps {
 export const OrderClient: React.FC<OrderClientProps> = ({
   data
 }) => {
+
   return (
     <>
-      <Heading title={`Orders (${data.length})`} description="Manage orders for your store" />
+      <Heading title={`Total Orderan ( ${data.length} )`} description="Kelola orderan rozic sparepart" />
       <Separator />
-      <DataTable searchKey="products" columns={columns} data={data} />
+      <DataTable searchKey="buyerName" columns={columns} data={data} placeholder="Cari Berdasar Nama Pembeli"/>
     </>
   );
 };

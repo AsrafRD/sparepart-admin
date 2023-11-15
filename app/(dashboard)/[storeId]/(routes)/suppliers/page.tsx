@@ -24,7 +24,7 @@ const suppliersPage = async ({
     name: item.name,
     address: item.address,
     phone: item.phone,
-    createdAt: format(item.createdAt, 'MMMM do, yyyy'),
+    createdAt: format(item.createdAt, 'dd MMMM yyyy'),
   }));
 
   return (

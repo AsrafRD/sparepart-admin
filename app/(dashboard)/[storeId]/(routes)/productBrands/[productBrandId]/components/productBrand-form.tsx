@@ -43,10 +43,10 @@ export const ProductBrandForm: React.FC<productBrandFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit product Brand' : 'Create product Brand';
-  const description = initialData ? 'Edit a product Brand.' : 'Add a new product Brand';
-  const toastMessage = initialData ? 'product Brand updated.' : 'product Brand created.';
-  const action = initialData ? 'Save changes' : 'Create';
+  const title = initialData ? 'Edit Merek Produk' : 'Tambah Merek Produk';
+  const description = initialData ? 'Edit merek produk ini.' : 'Tambah merek produk baru';
+  const toastMessage = initialData ? 'Merek produk berhasil diedit.' : 'Merek produk berhasil ditambahkan.';
+  const action = initialData ? 'Simpan' : 'Tambahkan';
 
   const form = useForm<productBrandFormValues>({
     resolver: zodResolver(formSchema),
@@ -67,7 +67,7 @@ export const ProductBrandForm: React.FC<productBrandFormProps> = ({
       router.push(`/${params.storeId}/productBrands`);
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toast.error('Seperti ada yang salah.');
     } finally {
       setLoading(false);
     }
@@ -79,9 +79,9 @@ export const ProductBrandForm: React.FC<productBrandFormProps> = ({
       await axios.delete(`/api/${params.storeId}/productBrands/${params.productBrandId}`);
       router.refresh();
       router.push(`/${params.storeId}/productBrands`);
-      toast.success('product Brand deleted.');
+      toast.success('Merek produk berhasil dihapus.');
     } catch (error: any) {
-      toast.error('Make sure you removed all products using this product Brand first.');
+      toast.error('Pastikan tidak ada elemen lain yang menggunakan elemen merek produk ini.');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -118,9 +118,9 @@ export const ProductBrandForm: React.FC<productBrandFormProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="product brand Name" {...field} />
+                    <Input disabled={loading} placeholder="Nama merek produk" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

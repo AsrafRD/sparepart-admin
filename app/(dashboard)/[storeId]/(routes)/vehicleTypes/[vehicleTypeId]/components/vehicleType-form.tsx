@@ -43,10 +43,10 @@ export const VehicleTypeForm: React.FC<vehicleTypeFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit Vehicle Type' : 'Create Vehicle Type';
-  const description = initialData ? 'Edit a Vehicle Type.' : 'Add a new Vehicle Type';
-  const toastMessage = initialData ? 'Vehicle Type updated.' : 'Vehicle Type created.';
-  const action = initialData ? 'Save changes' : 'Create';
+  const title = initialData ? 'Edit Tipe Kendaraan' : 'Tambah Tipe Kendaraan';
+  const description = initialData ? 'Edit tipe kendaraan ini.' : 'Tambahkan tipe kendaraan baru';
+  const toastMessage = initialData ? 'Tipe kendaraan berhasil diedit.' : 'Tipe kendaraan baru berhasil ditambahkan.';
+  const action = initialData ? 'Simpan' : 'Tambahkan';
 
   const form = useForm<vehicleTypeFormValues>({
     resolver: zodResolver(formSchema),
@@ -67,7 +67,7 @@ export const VehicleTypeForm: React.FC<vehicleTypeFormProps> = ({
       router.push(`/${params.storeId}/vehicleTypes`);
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toast.error('Sepertinya ada kesalahan.');
     } finally {
       setLoading(false);
     }
@@ -79,9 +79,9 @@ export const VehicleTypeForm: React.FC<vehicleTypeFormProps> = ({
       await axios.delete(`/api/${params.storeId}/vehicleTypes/${params.vehicleTypeId}`);
       router.refresh();
       router.push(`/${params.storeId}/vehicleTypes`);
-      toast.success('vehicle Type deleted.');
+      toast.success('Tipe kendaraan berhasil dihapus.');
     } catch (error: any) {
-      toast.error('Make sure you removed all products using this vehicle Type first.');
+      toast.error('Pastikan tidak ada elemen lain yang menggunakan elemen tipe kendaraan ini.');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -118,9 +118,9 @@ export const VehicleTypeForm: React.FC<vehicleTypeFormProps> = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="Vehicle Type Name" {...field} />
+                    <Input disabled={loading} placeholder="Nama tipe kendaraan" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -65,10 +65,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit product' : 'Create product';
-  const description = initialData ? 'Edit a product.' : 'Add a new product';
-  const toastMessage = initialData ? 'Product updated.' : 'Product created.';
-  const action = initialData ? 'Save changes' : 'Create';
+  const title = initialData ? 'Edit produk' : 'Tambah produk';
+  const description = initialData ? 'Kelola produk ini.' : 'Tambah produk baru';
+  const toastMessage = initialData ? 'Produk berhasil diedit.' : 'Produk berhasil ditambahkan.';
+  const action = initialData ? 'Simpan' : 'Tambahkan';
 
   const defaultValues = initialData ? {
     ...initialData,
@@ -102,7 +102,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       router.push(`/${params.storeId}/products`);
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toast.error('Sepertinya ada kesalahan.');
     } finally {
       setLoading(false);
     }
@@ -114,9 +114,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
       router.refresh();
       router.push(`/${params.storeId}/products`);
-      toast.success('Product deleted.');
+      toast.success('Produk berhasil dihapus.');
     } catch (error: any) {
-      toast.error('Something went wrong.');
+      toast.error('Pastikan tidak ada elemen lain yang menggunakan elemen produk ini.');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -146,13 +146,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       </div>
       <Separator />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full h-auto">
           <FormField
             control={form.control}
             name="images"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Images</FormLabel>
+                <FormLabel>Gambar</FormLabel>
                 <FormControl>
                   <ImageUpload 
                     value={field.value.map((image) => image.url)} 
@@ -165,15 +165,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               </FormItem>
             )}
           />
-          <div className="md:grid md:grid-cols-3 gap-8">
+          <div className="md:grid md:grid-cols-3 gap-8 space-y-2">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nama Produk</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="Product name" {...field} />
+                    <Input disabled={loading} placeholder="Nama Produk" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -184,9 +184,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price</FormLabel>
+                  <FormLabel>Harga</FormLabel>
                   <FormControl>
-                    <Input type="number" disabled={loading} placeholder="9.99" {...field} />
+                    <Input type="number" disabled={loading} placeholder="105000" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -197,11 +197,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Kategori</FormLabel>
                   <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a category" />
+                        <SelectValue defaultValue={field.value} placeholder="Pilih kategori" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -219,11 +219,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               name="vehicleBrandId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Vehicle Brand</FormLabel>
+                  <FormLabel>Merek Kendaraan</FormLabel>
                   <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a vehicle brand" />
+                        <SelectValue defaultValue={field.value} placeholder="Pilih Merek Kendaraan" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -241,11 +241,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               name="vehicleTypeId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Vehicle Type</FormLabel>
+                  <FormLabel>Tipe Kendaraan</FormLabel>
                   <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a vehicle type" />
+                        <SelectValue defaultValue={field.value} placeholder="Pilih Tipe Kendaraan" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -263,11 +263,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               name="productBrandId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Brand</FormLabel>
+                  <FormLabel>Merek Produk</FormLabel>
                   <Select disabled={loading} onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue defaultValue={field.value} placeholder="Select a product brand" />
+                        <SelectValue defaultValue={field.value} placeholder="Pilih Merek Produk" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -294,10 +294,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel>
-                      Featured
+                      Tampilkan Produk
                     </FormLabel>
                     <FormDescription>
-                      This product will appear on the home page
+                      Produk ini akan ditampilkan di toko.
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -317,10 +317,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                   </FormControl>
                   <div className="space-y-1 leading-none">
                     <FormLabel>
-                      Archived
+                      Tahan Produk
                     </FormLabel>
                     <FormDescription>
-                      This product will not appear anywhere in the store.
+                      Produk ini tidak akan ditampilkan di toko.
                     </FormDescription>
                   </div>
                 </FormItem>
