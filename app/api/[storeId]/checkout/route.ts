@@ -80,8 +80,9 @@ export async function POST(
       },
     });
 
-    const successUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/success=1`; // Ganti sesuai kebijakan URL Anda
-    const cancelUrl = `${process.env.FRONTEND_STORE_URL}/customer/cart?/canceled=1`; // Ganti sesuai kebijakan URL Anda
+    const successUrl = `${process.env.FRONTEND_STORE_URL}/cart?settlement=1`; // Ganti sesuai kebijakan URL Anda
+    const pendingUrl = `${process.env.FRONTEND_STORE_URL}/cart?pending=1`; // Ganti sesuai kebijakan URL Anda
+    const cancelUrl = `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`; // Ganti sesuai kebijakan URL Anda
 
     const session = await snap.createTransaction({
       transaction_details: {
@@ -102,31 +103,32 @@ export async function POST(
         },
       },
       success_redirect_url: successUrl, // URL setelah pembayaran berhasil
+      pending_redirect_url: pendingUrl, // URL jika pembayaran dibatalkan
       failure_redirect_url: cancelUrl, // URL jika pembayaran dibatalkan
       metadata: {
         orderId: order.id,
       },
     });
 
-    const orderId = order.id;
+    // const orderId = order.id;
 
-    await prismadb.order.update({
-      where: { id: orderId },
-      data: { isPaid: true }, // Ubah status pembayaran menjadi "true"
-    });
+    // await prismadb.order.update({
+    //   where: { id: orderId },
+    //   data: { isPaid: true }, // Ubah status pembayaran menjadi "true"
+    // });
 
-    const orderItem = await prismadb.orderItem.findUnique({
-      where: {
-        id: order.id, // Ganti dengan ID keranjang sesuai dengan implementasi Anda
-      },
-    });
-    if (orderItem) {
-      await prismadb.orderItem.delete({
-        where: {
-          id: orderItem.id,
-        },
-      });
-    }
+    // const orderItem = await prismadb.orderItem.findUnique({
+    //   where: {
+    //     id: order.id, // Ganti dengan ID keranjang sesuai dengan implementasi Anda
+    //   },
+    // });
+    // if (orderItem) {
+    //   await prismadb.orderItem.delete({
+    //     where: {
+    //       id: orderItem.id,
+    //     },
+    //   });
+    // }
 
     // const updatedCart = productIds.filter((item: any) => !productIds.includes(item.id));
 

@@ -3,38 +3,31 @@ import prismadb from "@/lib/prismadb";
 import snap from "@/lib/midtrans";
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const event = JSON.parse(body);
-
-  // Access the signature_key directly from the parsed JSON
-  const signature = event.signature_key;
-
+  const body = await req.text();
+  const signature = req.headers.get("X-Midtrans-Signature");
   if (!signature) {
-    return new NextResponse("Missing Midtrans Signature key", { status: 400 });
+    return new NextResponse("Missing Midtrans Signature", { status: 400 });
   }
 
   try {
-    // Validate Midtrans signature
-    // const isSignatureValid = snap.signatureKeyIsValid(body, signature);
-    // if (!isSignatureValid) {
-    //   return new NextResponse("Invalid Midtrans Signature", { status: 400 });
-    // }
+    // Validasi tanda tangan Midtrans
+    const isSignatureValid = snap.signatureKeyIsValid(body, signature);
+    if (!isSignatureValid) {
+      return new NextResponse("Invalid Midtrans Signature", { status: 400 });
+    }
 
-    // Parse the incoming webhook event
     const event = JSON.parse(body);
-    const eventType = event.transaction_status;
+    const eventType = event.event_type;
+    const orderId = event.data.order_id;
 
-    if (eventType === "settlement") {
-      // Handle successful payment
-      const orderId = event.order_id;
-
+    if (eventType === "transaction.status.settlement") {
+      // Logika untuk menangani pembayaran yang berhasil
       const order = await prismadb.order.update({
         where: {
           id: orderId,
         },
         data: {
           isPaid: true,
-          // Add other fields as needed
         },
         include: {
           orderItems: true,

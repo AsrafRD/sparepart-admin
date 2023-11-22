@@ -36,16 +36,16 @@ const OrdersPage = async ({
     address: item.address,
     products: item.orderItems.map((orderItem) => orderItem.product.name).join(', '),
     totalPrice: formatter.format(item.orderItems.reduce((total, item) => {
-      return total + Number(item.product.price)
+      return total + Number(item.product.price);
     }, 0)),
-    isPaid: item.isPaid,
+    isPaid: item.isPaid ? 'Sudah' : 'Belum',
     createdAt: format(item.createdAt, 'dd MMMM yyyy'),
   }));
 
   return (
     <div className="flex-col">
       <div className="flex-1 md:space-y-4 md:p-8 md:pt-6 space-y-2 px-4 pt-4">
-        <OrderClient data={formattedOrders} />
+        <OrderClient data={formattedOrders}/>
       </div>
     </div>
   );
