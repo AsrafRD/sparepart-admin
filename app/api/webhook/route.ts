@@ -4,7 +4,7 @@ import snap from "@/lib/midtrans";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const event = JSON.parse(body);
+  const event = body;
 
   // Access the signature_key directly from the parsed JSON
   const signature = event.signature_key;
@@ -21,7 +21,6 @@ export async function POST(req: Request) {
     // }
 
     // Parse the incoming webhook event
-    const event = JSON.parse(body);
     const eventType = event.transaction_status;
 
     if (eventType === "settlement") {
