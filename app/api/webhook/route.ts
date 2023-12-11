@@ -1,17 +1,11 @@
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
-import snap from "@/lib/midtrans";
 
 
 export async function POST(req: Request) {
   const body = await req.json();
-<<<<<<< HEAD
-  // const event = JSON.parse(body);
-=======
->>>>>>> 97aab7d56ab2bb8c29c37f7f5268a60e82f39bef
   const event = body;
 
-  // Access the signature_key directly from the parsed JSON
   const signature = event.signature_key;
 
   if (!signature) {
@@ -19,50 +13,23 @@ export async function POST(req: Request) {
   }
 
   try {
-    // Validate Midtrans signature
-    // const isSignatureValid = snap.Validate(body, signature);
-    // if (!isSignatureValid) {
-    //   return new NextResponse("Invalid Midtrans Signature", { status: 400 });
-    // }
-
-    // Parse the incoming webhook event
-<<<<<<< HEAD
-    // const event = JSON.parse(body);
-=======
->>>>>>> 97aab7d56ab2bb8c29c37f7f5268a60e82f39bef
+    
     const eventType = event.transaction_status;
 
     if (eventType === "settlement") {
-      // Handle successful payment
       const orderId = event.order_id;
 
-      const order = await prismadb.order.update({
+      await prismadb.order.update({
         where: {
           id: orderId,
         },
         data: {
           isPaid: true,
-          // Add other fields as needed
         },
         include: {
           orderItems: true,
         },
       });
-
-      // const productIds = order.orderItems.map(
-      //   (orderItem) => orderItem.productId
-      // );
-
-      // await prismadb.product.updateMany({
-      //   where: {
-      //     id: {
-      //       in: [...productIds],
-      //     },
-      //   },
-      //   data: {
-      //     isArchived: true,
-      //   },
-      // });
     }
 
     return new NextResponse("Webhook processed", { status: 200 });
