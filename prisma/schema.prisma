@@ -6,27 +6,29 @@ generator client {
 }
 
 datasource db {
-  provider     = "cockroachdb"
-  // provider     = "mysql"
+  // provider     = "cockroachdb"
+  provider     = "mysql"
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
 model Store {
-  id            String         @id @default(uuid())
-  name          String
-  userId        String
-  billboard     Billboard[]    @relation("StoreToBillboard")
-  categories    Category[]     @relation("StoreToCategory")
-  products      Product[]      @relation("StoreToProduct")
-  vehicleBrands VehicleBrand[] @relation("StoreToVehicleBrand")
-  vehicleTypes  VehicleType[]  @relation("StoreToVehicleType")
-  productBrands ProductBrand[] @relation("StoreToProductBrand")
-  orders        Order[]        @relation("StoreToOrder")
-  suppliers     Supplier[]     @relation("StoreToSupplier")
-  customers     Customer[]     @relation("StoreToCustomer")
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id              String           @id @default(uuid())
+  name            String
+  userId          String
+  billboard       Billboard[]      @relation("StoreToBillboard")
+  categories      Category[]       @relation("StoreToCategory")
+  products        Product[]        @relation("StoreToProduct")
+  problems        Problem[]        @relation("StoreToProblem")
+  indications     Indication[]     @relation("StoreToIndication")
+  recommendations Recommendation[] @relation("StoreToRecommendation")
+  rules           Rule[]           @relation("StoreToRule")
+  vehicleBrands   VehicleBrand[]   @relation("StoreToVehicleBrand")
+  vehicleTypes    VehicleType[]    @relation("StoreToVehicleType")
+  productBrands   ProductBrand[]   @relation("StoreToProductBrand")
+  orders          Order[]          @relation("StoreToOrder")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model Billboard {
@@ -94,25 +96,29 @@ model ProductBrand {
 }
 
 model Product {
-  id             String       @id @default(uuid())
-  storeId        String
-  store          Store        @relation("StoreToProduct", fields: [storeId], references: [id])
-  categoryId     String
-  category       Category     @relation("CategoryToProduct", fields: [categoryId], references: [id])
-  vehicleBrandId String // Foreign Key to VehicleBrand
-  vehicleBrand   VehicleBrand @relation(fields: [vehicleBrandId], references: [id])
-  vehicleTypeId  String // Foreign Key to VehicleType
-  vehicleType    VehicleType  @relation(fields: [vehicleTypeId], references: [id])
-  productBrandId String // Foreign Key to ProdyctBrand
-  productBrand   ProductBrand @relation(fields: [productBrandId], references: [id])
-  name           String
-  price          Decimal
-  isFeatured     Boolean      @default(false)
-  isArchived     Boolean      @default(false)
-  images         Image[]
-  orderItems     OrderItem[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  id              String           @id @default(uuid())
+  storeId         String
+  store           Store            @relation("StoreToProduct", fields: [storeId], references: [id])
+  categoryId      String
+  category        Category         @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  vehicleBrandId  String // Foreign Key to VehicleBrand
+  vehicleBrand    VehicleBrand     @relation(fields: [vehicleBrandId], references: [id])
+  vehicleTypeId   String // Foreign Key to VehicleType
+  vehicleType     VehicleType      @relation(fields: [vehicleTypeId], references: [id])
+  productBrandId  String // Foreign Key to ProdyctBrand
+  productBrand    ProductBrand     @relation(fields: [productBrandId], references: [id])
+  name            String
+  price           Int
+  stock           Int
+  weight          Int
+  description     String
+  isFeatured      Boolean          @default(false)
+  isArchived      Boolean          @default(false)
+  images          Image[]
+  orderItems      OrderItem[]
+  recommendations Recommendation[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([storeId])
   @@index([categoryId])
@@ -155,35 +161,68 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id])
   productId String
   product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
 
   @@index([orderId])
   @@index([productId])
 }
 
-model Supplier {
-  id        String   @id @default(uuid())
-  name      String
-  storeId   String
-  address   String
-  phone     String
-  store     Store    @relation("StoreToSupplier", fields: [storeId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+// Model sistem pakar
+
+model Problem {
+  id              String           @id @default(uuid())
+  kode            String
+  name            String
+  storeId         String
+  store           Store            @relation("StoreToProblem", fields: [storeId], references: [id])    
+  recommendations Recommendation[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([storeId])
 }
 
-model Customer {
-  id        String   @id @default(uuid())
-  name      String
-  userId    String
-  storeId   String
-  address   String
-  phone     String
-  email     String
-  store     Store    @relation("StoreToCustomer", fields: [storeId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Indication {
+  id              String           @id @default(uuid())
+  kode            String
+  name            String
+  storeId         String
+  store           Store            @relation("StoreToIndication", fields: [storeId], references: [id])
+  recommendations Recommendation[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@index([storeId])
+}
+
+model Rule {
+  id              String           @id @default(uuid())
+  storeId         String
+  store           Store            @relation("StoreToRule", fields: [storeId], references: [id])
+  kondisi         String
+  hasil           String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([storeId])
+}
+
+model Recommendation {
+  id           String     @id @default(uuid())
+  storeId      String
+  store        Store      @relation("StoreToRecommendation", fields: [storeId], references: [id])
+  indicationId String
+  indication   Indication @relation(fields: [indicationId], references: [id])
+  problemId    String
+  problem      Problem    @relation(fields: [problemId], references: [id])
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id])
+  confidence   Float
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([storeId])
+  @@index([indicationId])
+  @@index([problemId])
+  @@index([productId])
 }

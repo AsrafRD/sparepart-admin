@@ -27,11 +27,17 @@ import { AlertModal } from "@/components/modals/alert-modal"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import ImageUpload from "@/components/ui/image-upload"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Textarea } from "@/components/ui/textarea"
 
 const formSchema = z.object({
   name: z.string().min(1),
   images: z.object({ url: z.string() }).array(),
   price: z.coerce.number().min(1),
+  stock: z.coerce.number().min(1),
+  weight: z.coerce.number().min(1),
+  description: z.coerce.string().min(1),
+  // stock: z.number().min(1),
+  // weight: z.number().min(1),
   categoryId: z.string().min(1),
   vehicleBrandId: z.string().min(1),
   vehicleTypeId: z.string().min(1),
@@ -77,6 +83,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     name: '',
     images: [],
     price: 0,
+    stock: 0,
+    weight: 0,
+    description: '',
     categoryId: '',
     vehicleBrandId: '',
     vehicleTypeId: '',
@@ -194,6 +203,32 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             <FormField
               control={form.control}
+              name="stock"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Stok</FormLabel>
+                  <FormControl>
+                    <Input type="number" disabled={loading} placeholder="stok" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Berat</FormLabel>
+                  <FormControl>
+                    <Input type="number" disabled={loading} placeholder="Berat barang dalam gram" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="categoryId"
               render={({ field }) => (
                 <FormItem>
@@ -276,6 +311,19 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                       ))}
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Deskripsi produk</FormLabel>
+                  <FormControl>
+                    <Textarea typeof="textarea" disabled={loading} placeholder="Deskripsi Produk" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

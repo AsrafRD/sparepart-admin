@@ -34,10 +34,13 @@ const OrdersPage = async ({
     Email: item.Email,
     phone: item.phone,
     address: item.address,
+    statusOrder: item.statusOrder,
     products: item.orderItems.map((orderItem) => orderItem.product.name).join(', '),
-    totalPrice: formatter.format(item.orderItems.reduce((total, item) => {
-      return total + Number(item.product.price);
-    }, 0)),
+    totalPrice: formatter.format(
+      item.orderItems?.reduce((total: any, orderItem: any) => {
+        return total + Number(orderItem.product.price) * (orderItem.quantity || 1);
+      }, 0) || 0
+    ),
     isPaid: item.isPaid ? 'Sudah' : 'Belum',
     createdAt: format(item.createdAt, 'dd MMMM yyyy'),
   }));

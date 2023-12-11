@@ -11,5 +11,5 @@ export const config = {
   api: {
     bodyParser: true, // Enable default body parsing
   },
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)', '/customer'],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };

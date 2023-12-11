@@ -81,7 +81,7 @@ export async function PATCH(
 
     const body = await req.json();
 
-    const { name, price, categoryId, images, vehicleBrandId, vehicleTypeId , productBrandId, isFeatured, isArchived } = body;
+    const { name, price, stock, weight, description, categoryId, images, vehicleBrandId, vehicleTypeId , productBrandId, isFeatured, isArchived } = body;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
@@ -100,6 +100,18 @@ export async function PATCH(
     }
 
     if (!price) {
+      return new NextResponse("Price is required", { status: 400 });
+    }
+
+    if (!stock) {
+      return new NextResponse("Price is required", { status: 400 });
+    }
+    
+    if (!weight) {
+      return new NextResponse("Price is required", { status: 400 });
+    }
+
+    if (!description) {
       return new NextResponse("Price is required", { status: 400 });
     }
 
@@ -137,6 +149,9 @@ export async function PATCH(
       data: {
         name,
         price,
+        stock,
+        weight,
+        description,
         categoryId,
         vehicleBrandId,
         vehicleTypeId,

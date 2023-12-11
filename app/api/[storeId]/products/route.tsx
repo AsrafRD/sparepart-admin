@@ -3,6 +3,16 @@ import { auth } from '@clerk/nextjs';
 
 import prismadb from '@/lib/prismadb';
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
@@ -12,7 +22,7 @@ export async function POST(
 
     const body = await req.json();
 
-    const { name, price, categoryId, vehicleBrandId, vehicleTypeId, productBrandId, images, isFeatured, isArchived } = body;
+    const { name, price, stock, weight, description, categoryId, vehicleBrandId, vehicleTypeId, productBrandId, images, isFeatured, isArchived } = body;
 
     if (!userId) {
       return new NextResponse("Unauthenticated", { status: 403 });
@@ -27,6 +37,18 @@ export async function POST(
     }
 
     if (!price) {
+      return new NextResponse("Price is required", { status: 400 });
+    }
+
+    if (!stock) {
+      return new NextResponse("Price is required", { status: 400 });
+    }
+
+    if (!weight) {
+      return new NextResponse("Price is required", { status: 400 });
+    }
+
+    if (!description) {
       return new NextResponse("Price is required", { status: 400 });
     }
 
@@ -65,12 +87,15 @@ export async function POST(
       data: {
         name,
         price,
+        stock,
+        weight,
+        description,
         isFeatured,
         isArchived,
         categoryId,
         vehicleBrandId,
         vehicleTypeId,
-        productBrandId,
+        productBrandId, 
         storeId: params.storeId,
         images: {
           createMany: {
@@ -93,8 +118,16 @@ export async function GET(
   req: Request,
   { params }: { params: { storeId: string } },
 ) {
+
   try {
-    const { searchParams } = new URL(req.url)
+    const url = req.url;
+    
+    if (!url) {
+      return new NextResponse("URL is undefined", { status: 500 });
+    }
+
+    const { searchParams } = new URL(url)
+    const searchQuery = searchParams?.get('q') || '';
     const categoryId = searchParams.get('categoryId') || undefined;
     const vehicleBrandId = searchParams.get('vehicleBrandId') || undefined;
     const vehicleTypeId = searchParams.get('vehicleTypeId') || undefined;
@@ -107,6 +140,9 @@ export async function GET(
 
     const products = await prismadb.product.findMany({
       where: {
+        name: {
+          contains: searchQuery, // Use the search query to filter product names
+        },
         storeId: params.storeId,
         categoryId,
         vehicleBrandId,
@@ -126,8 +162,7 @@ export async function GET(
         createdAt: 'desc',
       }
     });
-  
-    return NextResponse.json(products);
+    return NextResponse.json(products, { headers: corsHeaders });
   } catch (error) {
     console.log('[PRODUCTS_GET]', error);
     return new NextResponse("Internal error", { status: 500 });

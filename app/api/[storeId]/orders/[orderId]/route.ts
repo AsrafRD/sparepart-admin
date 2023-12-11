@@ -1,41 +1,134 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs";
+
 import prismadb from "@/lib/prismadb";
 
-export async function POST(req: Request) {
+export async function GET(
+  req: Request,
+  { params }: { params: { orderId: string } }
+) {
   try {
-    const formData = await req.json();
-    const formDataValue = formData.orderId;
-
-    if (typeof formDataValue !== 'string') {
-      return new NextResponse("Invalid order id in the request body", { status: 400 });
+    if (!params.orderId) {
+      return new NextResponse("Product id is required", { status: 400 });
     }
 
-    const orderId: string = formDataValue;
-
-    const order = await prismadb.order.findUnique({
-      where: {
-        id: orderId
-      },
-      include: {
-        orderItems: {
-          include: {
-            product: true
+    const orders = await prismadb.order.findUnique({
+        where: {
+          id: params.orderId
+        },
+        include: {
+          orderItems: {
+            include: {
+              product: true
+            }
           }
         }
+      });
+  
+      console.log(orders)
+    return NextResponse.json(orders);
+  } catch (error) {
+    console.log('[PRODUCT_GET]', error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+};
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: { orderId: string, storeId: string } }
+) {
+  try {
+    const { userId } = auth();
+
+    if (!userId) {
+      return new NextResponse("Unauthenticated", { status: 403 });
+    }
+
+    if (!params.orderId) {
+      return new NextResponse("Product id is required", { status: 400 });
+    }
+
+    const storeByUserId = await prismadb.store.findFirst({
+      where: {
+        id: params.storeId,
+        userId
       }
     });
 
-    if (!order) {
-      return new NextResponse("Order not found", { status: 404 });
+    if (!storeByUserId) {
+      return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    // Tambahkan properti isPaid ke dalam objek order
-    const isPaid = order.isPaid; // Gantilah dengan nilai yang sesuai dari database
-
-    // Kirim respons JSON dengan properti isPaid
-    return Response.json({ order, isPaid});
-  } catch (error: any) {
-    console.error('[order_POST] Error:', error);
-    return new NextResponse(`Internal error: ${error.message}`, { status: 500 });
+    const order = await prismadb.order.delete({
+      where: {
+        id: params.orderId
+      },
+    });
+  
+    return NextResponse.json(order);
+  } catch (error) {
+    console.log('[ORDER_DELETE]', error);
+    return new NextResponse("Internal error", { status: 500 });
   }
-}
+};
+
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { orderId: string, storeId: string } }
+) {
+  try {
+    const { userId } = auth();
+
+    const body = await req.json();
+
+    const { statusOrder } = body;
+
+    if (!userId) {
+      return new NextResponse("Unauthenticated", { status: 403 });
+    }
+
+    if (!params.orderId) {
+      return new NextResponse("Product id is required", { status: 400 });
+    }
+
+    if (!statusOrder) {
+      return new NextResponse("Name is required", { status: 400 });
+    }
+
+    const storeByUserId = await prismadb.store.findFirst({
+      where: {
+        id: params.storeId,
+        userId
+      }
+    });
+
+    if (!storeByUserId) {
+      return new NextResponse("Unauthorized", { status: 405 });
+    }
+
+    //hal janggal
+    await prismadb.order.update({
+      where: {
+        id: params.orderId
+      },
+      data: {
+        statusOrder
+      },
+    });
+
+    const order = await prismadb.order.update({
+      where: {
+        id: params.orderId
+      },
+      data: {
+        statusOrder,
+      },
+    })
+  
+    return NextResponse.json(order);
+  } catch (error) {
+    console.log('[PRODUCT_PATCH]', error);
+    return new NextResponse("Internal error", { status: 500 });
+  }
+};

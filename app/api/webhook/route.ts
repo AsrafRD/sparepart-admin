@@ -2,9 +2,11 @@ import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 import snap from "@/lib/midtrans";
 
+
 export async function POST(req: Request) {
   const body = await req.json();
-  const event = JSON.parse(body);
+  // const event = JSON.parse(body);
+  const event = body;
 
   // Access the signature_key directly from the parsed JSON
   const signature = event.signature_key;
@@ -15,13 +17,13 @@ export async function POST(req: Request) {
 
   try {
     // Validate Midtrans signature
-    // const isSignatureValid = snap.signatureKeyIsValid(body, signature);
+    // const isSignatureValid = snap.Validate(body, signature);
     // if (!isSignatureValid) {
     //   return new NextResponse("Invalid Midtrans Signature", { status: 400 });
     // }
 
     // Parse the incoming webhook event
-    const event = JSON.parse(body);
+    // const event = JSON.parse(body);
     const eventType = event.transaction_status;
 
     if (eventType === "settlement") {
@@ -41,20 +43,20 @@ export async function POST(req: Request) {
         },
       });
 
-      const productIds = order.orderItems.map(
-        (orderItem) => orderItem.productId
-      );
+      // const productIds = order.orderItems.map(
+      //   (orderItem) => orderItem.productId
+      // );
 
-      await prismadb.product.updateMany({
-        where: {
-          id: {
-            in: [...productIds],
-          },
-        },
-        data: {
-          isArchived: true,
-        },
-      });
+      // await prismadb.product.updateMany({
+      //   where: {
+      //     id: {
+      //       in: [...productIds],
+      //     },
+      //   },
+      //   data: {
+      //     isArchived: true,
+      //   },
+      // });
     }
 
     return new NextResponse("Webhook processed", { status: 200 });

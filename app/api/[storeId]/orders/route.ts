@@ -19,7 +19,7 @@ export async function POST(
     const data = await req.json();
     const orderId = data.order_id;
 
-    console.log("data yang dikirim klien",orderId)
+    // console.log("data yang dikirim klien",orderId)
 
     if (!orderId || orderId.length === 0) {
       return new NextResponse("Invalid order id in the request body", { status: 400 });

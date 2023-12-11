@@ -30,17 +30,17 @@ export const AlertModal: React.FC<AlertModalProps> = ({
 
     return (
         <Modal
-            title="Are you sure?"
-            description="This action cannot be undone."
+            title="Apakah anda yakin ingin menghapus?"
+            description="anda harus menginputkan data ulang jika ingin data kembali."
             isOpen={isOpen}
             onClose={onClose}
         >
-            <div className="pt-6 space -x-2 flex items-center justify-end">
-                <Button disabled={loading} variant="outline" onClick={onClose}>
-                    Cancel
+            <div className="pt-6 space-x-2 flex items-center justify-end">
+                <Button disabled={loading} variant="outline" onClick={onClose} className="py-2 px-4">
+                    Tidak
                 </Button>
-                <Button disabled={loading} variant="destructive" onClick={onConfirm}>
-                    Continue
+                <Button disabled={loading} variant="destructive" onClick={onConfirm} className="py-2 px-6">
+                    Ya
                 </Button>
             </div>
 

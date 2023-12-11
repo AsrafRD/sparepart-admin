@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "react-hot-toast"
 import { Trash } from "lucide-react"
-import { Order } from "@prisma/client"
+import { Image, Product, Order } from "@prisma/client"
 import { useParams, useRouter } from "next/navigation"
 
 import { Input } from "@/components/ui/input"
@@ -25,22 +25,17 @@ import { Heading } from "@/components/ui/heading"
 import { AlertModal } from "@/components/modals/alert-modal"
 
 const formSchema = z.object({
-  buyerName: z.string().min(1),
-  Email: z.string().min(1),
-  phone: z.string().min(1),
-  address: z.string().min(1),
-  totalPrice: z.string().min(1),
-  isPaid: z.boolean(),
+  statusOrder: z.string().min(1),
 });
 
-type productBrandFormValues = z.infer<typeof formSchema>
+type ProductFormValues = z.infer<typeof formSchema>
 
-interface productBrandFormProps {
-  initialData: Order | null;
+interface ProductFormProps {
+  initialData: Order[]
 };
 
-export const OrderForm: React.FC<productBrandFormProps> = ({
-  initialData
+export const ProductForm: React.FC<ProductFormProps> = ({
+  initialData,
 }) => {
   const params = useParams();
   const router = useRouter();
@@ -48,36 +43,35 @@ export const OrderForm: React.FC<productBrandFormProps> = ({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const title = initialData ? 'Edit Merek Produk' : 'Tambah Merek Produk';
-  const description = initialData ? 'Edit merek produk ini.' : 'Tambah merek produk baru';
-  const toastMessage = initialData ? 'Merek produk berhasil diedit.' : 'Merek produk berhasil ditambahkan.';
+  const title = initialData ? 'Edit produk' : 'Tambah produk';
+  const description = initialData ? 'Kelola produk ini.' : 'Tambah produk baru';
+  const toastMessage = initialData ? 'Produk berhasil diedit.' : 'Produk berhasil ditambahkan.';
   const action = initialData ? 'Simpan' : 'Tambahkan';
 
-  const form = useForm<productBrandFormValues>({
+  const defaultValues = initialData ? {
+    ...initialData,
+  } : {
+    statusOrder: '',
+  }
+
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || {
-      buyerName: '',
-      Email: '',
-      phone: '',
-      address: '',
-      totalPrice: '',
-      isPaid: true,
-    }
+    defaultValues
   });
 
-  const onSubmit = async (data: productBrandFormValues) => {
+  const onSubmit = async (data: ProductFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
-        await axios.patch(`/api/${params.storeId}/productBrands/${params.productBrandId}`, data);
+        await axios.patch(`/api/${params.storeId}/orders/${params.orderId}`, data);
       } else {
-        await axios.post(`/api/${params.storeId}/productBrands`, data);
+        await axios.post(`/api/${params.storeId}/orders`, data);
       }
       router.refresh();
-      router.push(`/${params.storeId}/productBrands`);
+      router.push(`/${params.storeId}/orders`);
       toast.success(toastMessage);
     } catch (error: any) {
-      toast.error('Seperti ada yang salah.');
+      toast.error('Sepertinya ada kesalahan.');
     } finally {
       setLoading(false);
     }
@@ -86,10 +80,10 @@ export const OrderForm: React.FC<productBrandFormProps> = ({
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/productBrands/${params.productBrandId}`);
+      await axios.delete(`/api/${params.storeId}/orders/${params.orderId}`);
       router.refresh();
-      router.push(`/${params.storeId}/productBrands`);
-      toast.success('Merek produk berhasil dihapus.');
+      router.push(`/${params.storeId}/orders`);
+      toast.success('Orderan berhasil dihapus.');
     } catch (error: any) {
       toast.error('Pastikan tidak ada elemen lain yang menggunakan elemen produk ini.');
     } finally {
@@ -121,29 +115,17 @@ export const OrderForm: React.FC<productBrandFormProps> = ({
       </div>
       <Separator />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
-          <div className="md:grid md:grid-cols-3 gap-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full h-auto">
+
+          <div className="md:grid md:grid-cols-3 gap-8 space-y-2">
             <FormField
               control={form.control}
-              name="buyerName"
+              name="statusOrder"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Pembeli</FormLabel>
+                  <FormLabel>Status Order</FormLabel>
                   <FormControl>
-                    <Input disabled={loading} placeholder="Nama Pembeli" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="Email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nama Pembeli</FormLabel>
-                  <FormControl>
-                    <Input disabled={loading} placeholder="Email Pembeli" {...field} />
+                    <Input disabled={loading} placeholder="isi dengan status order" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

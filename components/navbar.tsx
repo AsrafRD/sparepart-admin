@@ -22,12 +22,14 @@ const Navbar = async () => {
   return (
     <div className="mx-auto max-w-7xl py-1 sm:px-6 lg:px-8">
       <div className="border-b">
-        <div className="flex h-16 justify-center items-center space-x-4">
+        <div className="flex h-16 justify-center justify-between items-center">
           <Nav />
-          <StoreSwitcher items={stores} />
-          <ThemeToggle />
-          <UserButton afterSignOutUrl="/" />
-          <div className="ml-auto flex items-center px-2 md:space-x-4"></div>
+          <div className="flex justify-center justify-between items-center space-x-2 md:space-x-4">
+            <StoreSwitcher items={stores} />
+            <ThemeToggle />
+            <UserButton afterSignOutUrl="/" />
+            <div className="ml-auto flex items-center px-2 md:space-x-4"></div>
+          </div>
         </div>
       </div>
     </div>
