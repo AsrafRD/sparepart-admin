@@ -133,8 +133,10 @@ export async function POST(
 
   const totalPrice = itemsData.reduce((total: any, item: any) => {
     const itemPrice = parseFloat(item.price); // Mengubah string harga menjadi angka float
-    return total + selectedShippingCost + item.quantity * itemPrice;
+    return total + item.quantity * itemPrice;
   }, 0);
+
+  const grossAmount = totalPrice + selectedShippingCost
 
 
   if (!productIds || productIds.length === 0) {
@@ -196,7 +198,7 @@ export async function POST(
   const session = await snap.createTransaction({
     transaction_details: {
       order_id: order.id,
-      gross_amount: totalPrice,
+      gross_amount: grossAmount,
     },
     item_details: itemsSnap,
     customer_details: {
